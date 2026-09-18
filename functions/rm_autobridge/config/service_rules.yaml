@@ -1,0 +1,73 @@
+# Service scheduling rules and parameters
+
+# Service time allocations (minutes)
+service_times:
+  standard: 20
+  drain: 40
+  fill: 20
+
+# Service windows (for time-based scheduling if needed)
+service_windows:
+  drain:
+    start: "08:00"
+    end: "13:00"
+  fill:
+    start: "08:00"
+    end: "15:45"
+  standard:
+    start: "08:00"
+    end: "17:00"
+
+# Week-of-month date ranges for service group distribution
+# Used to determine starting week from service group
+service_group_weeks:
+  1: [1, 7]    # Days 1-7 of the month
+  2: [8, 14]   # Days 8-14
+  3: [15, 21]  # Days 15-21
+  4: [22, 28]  # Days 22-28
+
+# Frequency patterns (days between visits)
+recurrence_patterns:
+  weekly: 7
+  bi_monthly: 14
+  monthly: 30  # Approximate, actual is same day each month
+  quarterly: 90  # Approximate
+
+# D&D Service group mappings
+dd_service_groups:
+  quarterly:
+    # Maps DD service group to quarter of year
+    1: 1  # Q1 (Jan-Mar)
+    2: 2  # Q2 (Apr-Jun)
+    3: 3  # Q3 (Jul-Sep)
+    4: 4  # Q4 (Oct-Dec)
+
+  semi_annual:
+    # Maps DD service group to half of year
+    1: 1  # First half (Jan-Jun)
+    2: 2  # Second half (Jul-Dec)
+
+  monthly:
+    # Maps DD service group to month offset
+    1: 1   # January + every 1 month
+    2: 2   # February + every 1 month
+    3: 3   # March + every 1 month
+    4: 4   # April + every 1 month
+    5: 5   # May + every 1 month
+    6: 6   # June + every 1 month
+    7: 7   # July + every 1 month
+    8: 8   # August + every 1 month
+    9: 9   # September + every 1 month
+    10: 10 # October + every 1 month
+    11: 11 # November + every 1 month
+    12: 12 # December + every 1 month
+
+# Visit frequency per year by membership type
+annual_visit_counts:
+  annual: 1
+  semi_annual: 2
+  quarterly: 4
+  monthly: 12
+  bi_monthly: 26  # Every 2 weeks
+  weekly: 52
+  twice_weekly: 104

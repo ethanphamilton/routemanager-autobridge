@@ -1,0 +1,48 @@
+# Membership tier definitions
+# Maps membership type names (exact strings from Zoho CRM) to frequency categories
+# (must match Frequency enum values in src/models/enums.py)
+
+annual:
+  - "Annual Residential Package"
+  - "Annual SwimSpa Residential Package"
+  - "Annual Residential Specialty Spa Maintenance Package"
+
+semi_annual:
+  - "Semi-Annual Residential Package"
+  - "Semi-Annual SwimSpa Residential Package"
+  - "Semi-Annual Residential Specialty Spa Maintenance Package"
+
+quarterly:
+  - "Quarterly Residential Package"
+  - "Quarterly SwimSpa Residential Package"
+  - "Quarterly Residential Specialty Spa Maintenance Package"
+
+monthly:
+  - "Monthly Residential Package"
+  - "Monthly SwimSpa Residential Package"
+  - "Monthly Residential Specialty Spa Maintenance Package"
+  - "PartnerAccount: Monthly Maintenance with Quarterly Drain and Details"
+
+bi_monthly:
+  - "Bi-Monthly Residential Package"
+  - "Bi-Monthly SwimSpa Residential Package"
+  - "Bi-Monthly Residential Specialty Spa Maintenance Package"
+
+weekly:
+  - "Weekly Residential Package"
+  - "Weekly SwimSpa Residential Package"
+  - "Weekly Residential Specialty Spa Maintenance Package"
+  - "PartnerAccount: Once Weekly Maintenance with Quarterly Drain and Details"
+
+weekly_monthly:
+  - "Once Weekly Vacation Rental"
+  - "Weekly Residential Specialty Spa Maintenance Package with Monthly Drain and Details"
+  - "Once Weekly Specialty Spa Vacation Rental Maintenance"
+  - "PartnerAccount: Once Weekly Maintenance with Monthly Drain and Details"
+
+twice_weekly:
+  - "Twice Weekly Vacation Rental"
+  - "Twice Weekly Specialty Spa Vacation Rental Maintenance"
+
+custom_biweekly_dd:
+  - "CUSTOM: Once Weekly Maintenance / Every Other Week Drain and Detail"
