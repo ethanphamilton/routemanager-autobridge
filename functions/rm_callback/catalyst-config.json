@@ -1,0 +1,12 @@
+{
+  "deployment": {
+    "name": "rm_callback",
+    "stack": "python_3_9",
+    "type": "advancedio",
+    "memory": 256,
+    "env_variables": {}
+  },
+  "execution": {
+    "main": "main.py"
+  }
+}
