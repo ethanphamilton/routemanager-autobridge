@@ -1,0 +1,17 @@
+{
+  "functions": {
+    "source": "functions",
+    "targets": [
+      "rm_autobridge",
+      "rm_callback"
+    ],
+    "ignore": [
+      ".env",
+      ".env.*",
+      "__pycache__",
+      "*.pyc",
+      ".pytest_cache",
+      "tests"
+    ]
+  }
+}

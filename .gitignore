@@ -1,0 +1,72 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Logging
+*.log
+
+# Environment
+.env
+.env.local
+
+# Catalyst
+.catalystrc
+catalyst-debug.log
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# Customer data
+properties.csv
+
+# Run output (customer data — never commit)
+functions/rm_autobridge/output/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Manual trigger run artifacts
+run-artifacts/
