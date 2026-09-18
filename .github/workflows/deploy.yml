@@ -1,0 +1,108 @@
+name: Deploy to Catalyst
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          # Pinned to match the deployed Catalyst stack (python_3_9 in both
+          # functions/*/catalyst-config.json) — this project has a real
+          # history of a Python-3.9-incompatible syntax bug reaching main
+          # undetected on a newer local interpreter.
+          python-version: "3.9"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Lint
+        run: |
+          pip install ruff black
+          ruff check .
+          black --check .
+
+      - name: Run tests
+        run: pytest tests/ -v
+
+  deploy:
+    needs: test
+    # Two guards, both load-bearing in the production repository:
+    #   - event_name: a pull_request run is test-only. PR branches there can
+    #     read the deploy secrets, so without this, opening a PR would deploy
+    #     that branch straight to the live Catalyst environment.
+    #   - repository: this public snapshot holds no credentials and must never
+    #     attempt a deploy at all.
+    if: github.event_name == 'push' && github.repository == 'ethanphamilton/RM-autobridge'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          # The Catalyst CLI itself shells out to python3.9 to package/validate
+          # the python_3_9-stack rm_autobridge function - needed here too, not
+          # just in the test job (which runs in a separate, unrelated runner).
+          python-version: "3.9"
+
+      - name: Install Catalyst CLI
+        run: npm i -g zcatalyst-cli
+
+      - name: Write function .env files
+        env:
+          ZOHO_ACCOUNTS_URL: ${{ secrets.ZOHO_ACCOUNTS_URL }}
+          ZOHO_CLIENT_ID: ${{ secrets.ZOHO_CLIENT_ID }}
+          ZOHO_CLIENT_SECRET: ${{ secrets.ZOHO_CLIENT_SECRET }}
+          ZOHO_ACCESS_TOKEN: ${{ secrets.ZOHO_ACCESS_TOKEN }}
+          ZOHO_REFRESH_TOKEN: ${{ secrets.ZOHO_REFRESH_TOKEN }}
+          ZOHO_API_DOMAIN: ${{ secrets.ZOHO_API_DOMAIN }}
+          WORKWAVE_API_KEY: ${{ secrets.WORKWAVE_API_KEY }}
+          WORKWAVE_TERRITORY_ID: ${{ secrets.WORKWAVE_TERRITORY_ID }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          RESEND_FROM_ADDRESS: ${{ secrets.RESEND_FROM_ADDRESS }}
+          CALLBACK_SHARED_SECRET: ${{ secrets.CALLBACK_SHARED_SECRET }}
+        run: |
+          # CATALYST_RUN_ARTIFACTS_FOLDER_ID intentionally omitted: Catalyst's
+          # deploy API rejects any function env_variables key with a "CATALYST_"
+          # prefix as a reserved keyword (HTTP 400), regardless of value. This
+          # key was never actually set locally either, so the File Store
+          # archiving feature it gates has never been functional - not a
+          # regression. Fixing it for real needs the app itself to use a
+          # differently-named env var; out of scope for this pipeline fix.
+          cat > functions/rm_autobridge/.env <<EOF
+          ZOHO_ACCOUNTS_URL=$ZOHO_ACCOUNTS_URL
+          ZOHO_CLIENT_ID=$ZOHO_CLIENT_ID
+          ZOHO_CLIENT_SECRET=$ZOHO_CLIENT_SECRET
+          ZOHO_ACCESS_TOKEN=$ZOHO_ACCESS_TOKEN
+          ZOHO_REFRESH_TOKEN=$ZOHO_REFRESH_TOKEN
+          ZOHO_API_DOMAIN=$ZOHO_API_DOMAIN
+          WORKWAVE_API_KEY=$WORKWAVE_API_KEY
+          WORKWAVE_TERRITORY_ID=$WORKWAVE_TERRITORY_ID
+          RESEND_API_KEY=$RESEND_API_KEY
+          RESEND_FROM_ADDRESS=$RESEND_FROM_ADDRESS
+          EOF
+          cat > functions/rm_callback/.env <<EOF
+          CALLBACK_SHARED_SECRET=$CALLBACK_SHARED_SECRET
+          EOF
+
+      - name: Deploy to Catalyst
+        env:
+          CATALYST_TOKEN: ${{ secrets.CATALYST_TOKEN }}
+          # Both must be set together: GitHub Actions sets CI=true, which makes
+          # the Catalyst CLI ignore .catalystrc and require -p + --org explicitly
+          # (undocumented CLI behavior, confirmed by testing). The org id is the
+          # one returned by the Catalyst console's own /baas/v1/orgs API - the
+          # account ZUID and the project's domain id are both rejected with
+          # "Org identifier given is not valid".
+          CATALYST_PROJECT_ID: ${{ secrets.CATALYST_PROJECT_ID }}
+          CATALYST_ORG_ID: ${{ secrets.CATALYST_ORG_ID }}
+        run: ./deploy.sh
